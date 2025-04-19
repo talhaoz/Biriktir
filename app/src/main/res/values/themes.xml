@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Biriktir" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Green theme -->
+    <style name="DatePickerGreen" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorPrimary">#2B6E4F</item>
+    </style>
+
+    <!-- Blue theme -->
+    <style name="DatePickerBlue" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorPrimary">#1565C0</item>
+    </style>
+
+    <!-- Orange theme -->
+    <style name="DatePickerOrange" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorPrimary">#F57C00</item>
+    </style>
+
+</resources>
