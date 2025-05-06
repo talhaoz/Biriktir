@@ -81,10 +81,10 @@ fun CurrencyDropDown(
     }
 }
 
-enum class Currency(val code: String){
-    TRY("TRY"),
-    ALT("ALT"),
-    EUR("EUR"),
-    USD("USD"),
-    GBP("GBP")
+enum class Currency(val code: String, val symbol: String){
+    TRY("TRY", "₺"),
+    ALT("ALT","gram "),
+    EUR("EUR","€"),
+    USD("USD","$"),
+    GBP("GBP","£")
 }

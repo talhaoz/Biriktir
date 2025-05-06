@@ -1,9 +1,10 @@
-package com.talhaoz.biriktir.presentation.screens.savings.allsavings
+package com.talhaoz.biriktir.presentation.screens.savings.allsavinggoals
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -25,28 +25,44 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
+import com.talhaoz.biriktir.domain.model.SavingGoal
+import com.talhaoz.biriktir.presentation.components.EmptyStatePlaceHolder
+import com.talhaoz.biriktir.presentation.components.ErrorMessageCard
 
 @Composable
 fun AllSavingsScreen(
-    savings: List<SavingGoal>,
-    onAddGoalClick: () -> Unit,
-    onGoalClick: (SavingGoal) -> Unit
+    viewModel: AllSavingGoalsViewModel = hiltViewModel(),
+    onSavingGoalClick: (Int) -> Unit
 ) {
+    val state by viewModel.uiState.collectAsState()
+
+    // One time call
+    LaunchedEffect(Unit) {
+        viewModel.getAllGoals()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF6F6EE)) // Arka plan
+            .background(Color(0xFFF6F6F6)) // Arka plan
             .padding(horizontal = 24.dp, vertical = 32.dp)
             .verticalScroll(ScrollState(0))
     ) {
@@ -59,38 +75,54 @@ fun AllSavingsScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(savings) { goal ->
-                GoalCard(goal = goal, onClick = { onGoalClick(goal) })
+        when (state) {
+            is SavingGoalsState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
+            is SavingGoalsState.Ready -> {
+                val goals = (state as SavingGoalsState.Ready).savingGoals
 
-        Button(
-            onClick = onAddGoalClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = null,
-                tint = Color.White
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Hedef Ekle", fontSize = 16.sp, color = Color.White)
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        if(goals.isEmpty()){
+                            EmptyStatePlaceHolder(
+                                modifier = Modifier.padding(top = 200.dp),
+                                title = "Hiç birikim hedefi eklemedin.",
+                                description = "Yeni bir hedef ekleyerek birikime başlayabilirsin."
+                            )
+                        }
+                    }
+                    items(goals) { goal ->
+                        GoalCard(goal = goal, onClick = { onSavingGoalClick(goal.id) })
+                    }
+                }
+            }
+
+            is SavingGoalsState.Error -> {
+                val message = (state as SavingGoalsState.Error).message
+                ErrorMessageCard(
+                    message = message,
+                    onRetryClicked = {
+                        viewModel.getAllGoals()
+                    }
+                )
+            }
         }
     }
 }
 
 @Composable
 fun GoalCard(goal: SavingGoal, onClick: () -> Unit) {
+    val currencySymbol = goal.currencyType.symbol
+    val savedAmount = goal.savedAmount
+    val targetAmount = goal.targetAmount
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,7 +153,7 @@ fun GoalCard(goal: SavingGoal, onClick: () -> Unit) {
             Spacer(modifier = Modifier.height(12.dp))
 
             LinearProgressIndicator(
-                progress = { (goal.currentAmount / goal.targetAmount).toFloat() },
+                progress = { (savedAmount / targetAmount).toFloat() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(12.dp)
@@ -137,11 +169,11 @@ fun GoalCard(goal: SavingGoal, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "%.0f EUR".format(goal.currentAmount),
+                    text = "${savedAmount.toInt()} $currencySymbol".format(goal.savedAmount),
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "%.0f EUR".format(goal.targetAmount),
+                    text = "${targetAmount.toInt()} $currencySymbol".format(goal.targetAmount),
                     fontWeight = FontWeight.Medium
                 )
             }

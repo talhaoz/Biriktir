@@ -2,10 +2,8 @@ package com.talhaoz.biriktir.presentation.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Screen(val title: String? = null, val icon: ImageVector? = null, val route: String) {
@@ -16,14 +14,12 @@ sealed class Screen(val title: String? = null, val icon: ImageVector? = null, va
     data object BottomBarProfile : Screen("Hesabim", Icons.Default.Person, "profile")
 
     // Other Screens
-    data object AddToExistingSaving : Screen(route = "add_saving")
-    data object AllSavings : Screen(route = "all_savings")
-
-/*    object Detail    : Screen(route = "detail/{itemId}") {
-        fun createRoute(itemId: Int) = "detail/$itemId"
-    }*/
-    /*object Settings  : Screen("settings")
-    object Profile   : Screen("profile")*/
+    data object AddSavingEntry : Screen(route = "add_saving_entry/{goalId}/{currencyType}") {
+        fun createRoute(goalId: Int, currencyType: String) = "add_saving_entry/$goalId/$currencyType"
+    }
+    data object SavingGoalDetail : Screen(route = "saving_goal_detail/{goalId}") {
+        fun createRoute(goalId: Int) = "saving_goal_detail/$goalId"
+    }
 }
 
 

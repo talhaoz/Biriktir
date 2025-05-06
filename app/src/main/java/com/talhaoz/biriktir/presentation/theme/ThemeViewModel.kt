@@ -2,12 +2,15 @@ package com.talhaoz.biriktir.presentation.theme
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.talhaoz.biriktir.data.local.ThemePreferenceDataStore
+import com.talhaoz.biriktir.data.local.datastore.ThemePreferenceDataStore
 import com.talhaoz.biriktir.ui.theme.AppTheme
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ThemeViewModel(
+@HiltViewModel
+class ThemeViewModel @Inject constructor(
     private val themePreference: ThemePreferenceDataStore
 ) : ViewModel() {
     val themeState: StateFlow<AppTheme> = themePreference.themeFlow.stateIn(
