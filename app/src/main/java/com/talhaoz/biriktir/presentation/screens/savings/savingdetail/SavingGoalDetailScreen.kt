@@ -16,13 +16,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -306,8 +303,8 @@ fun SavingDetailScreen(
         if(showDeleteEntryDialog){
             willBeDeletedEntry?.let { entry ->
                 ConfirmationDialog(
-                    title = "Kaydi Sil",
-                    description = "Miktar: ${entry.amount.toInt()} \nTarih: ${entry.date.formatAsDate()}\n\nKaydi silmek istediğine emin misin?",
+                    title = "Kaydı Sil",
+                    description = "Miktar: ${entry.amount.toInt()} \nTarih: ${entry.date.formatAsDate()}\n\nKaydı silmek istediğine emin misin?",
                     onConfirmClicked = {
                         viewModel.deleteEntry(entry.id, goalId)
                         showDeleteEntryDialog = false

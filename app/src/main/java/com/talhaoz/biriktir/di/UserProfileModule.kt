@@ -6,11 +6,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.talhaoz.biriktir.data.local.dao.UserProfileDao
 import com.talhaoz.biriktir.data.local.database.BiriktirDatabase
-import com.talhaoz.biriktir.data.local.datastore.NotificationSettingsDataStore
+import com.talhaoz.biriktir.data.local.datastore.SalaryDaySettingsDataStore
 import com.talhaoz.biriktir.data.local.datastore.ThemePreferenceDataStore
 import com.talhaoz.biriktir.data.repository.UserProfileRepositoryImpl
 import com.talhaoz.biriktir.domain.repository.UserProfileRepository
 import com.talhaoz.biriktir.domain.usecase.GetUserProfile
+import com.talhaoz.biriktir.domain.usecase.UpdateUserPhoto
 import com.talhaoz.biriktir.domain.usecase.UpdateUserProfile
 import com.talhaoz.biriktir.domain.usecase.UserProfileUseCases
 import dagger.Module
@@ -25,7 +26,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object UserProfileModule {
 
-    private val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+    val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
     @Provides
     @Singleton
@@ -44,14 +45,15 @@ object UserProfileModule {
         repository: UserProfileRepository
     ): UserProfileUseCases = UserProfileUseCases(
         getProfile = GetUserProfile(repository),
-        updateProfile = UpdateUserProfile(repository)
+        updateProfile = UpdateUserProfile(repository),
+        updateUserPhoto = UpdateUserPhoto(repository)
     )
 
     @Provides
     @Singleton
     fun provideNotificationSettingsDataStore(
         @ApplicationContext appContext: Context
-    ): NotificationSettingsDataStore = NotificationSettingsDataStore(
+    ): SalaryDaySettingsDataStore = SalaryDaySettingsDataStore(
         dataStore = appContext.settingsDataStore
     )
 

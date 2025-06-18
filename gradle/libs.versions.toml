@@ -23,13 +23,12 @@ uiTestJunit4 = "1.7.8"
 uiTooling = "1.7.8"
 uiToolingPreview = "1.7.8"
 daggerHiltVersion = "2.51"
-daggerHiltHilt = "1.0.0"
 daggerHiltNavigation = "1.2.0"
 kotlinKaptVersion = "2.1.20"
 room_version = "2.6.1"
 google-ksp = "2.0.0-1.0.21"
 work-runtime = "2.9.0"
-accompanist-permission = "0.37.3"
+accompanist-permission = "0.36.0"
 
 [libraries]
 androidx-activity-compose-v190 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
@@ -70,8 +69,6 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room_ve
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room_version" }
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work-runtime" }
 accompanist-permission = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permission" }
-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "daggerHiltHilt" }
-hilt-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "daggerHiltHilt" }
 
 
 [plugins]

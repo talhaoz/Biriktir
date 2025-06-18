@@ -18,9 +18,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import com.talhaoz.biriktir.notification.SalaryReminderWorker
 import com.talhaoz.biriktir.presentation.components.Currency
 import com.talhaoz.biriktir.presentation.navigation.BottomNavigationBar
 import com.talhaoz.biriktir.presentation.navigation.Screen
@@ -37,6 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -77,6 +75,7 @@ fun MainScreen(modifier: Modifier = Modifier, themeViewModel: ThemeViewModel = h
             startDestination = Screen.BottomBarSavings.route,
             modifier = modifier.padding(innerPadding)
         ) {
+
             // BottomBar Screens
             composable(Screen.BottomBarSavings.route) {
                 AllSavingsScreen (
@@ -84,6 +83,7 @@ fun MainScreen(modifier: Modifier = Modifier, themeViewModel: ThemeViewModel = h
                         navController.navigate(Screen.SavingGoalDetail.createRoute(it))
                     }
                 )
+                //DebugNotificationTestScreen()
             }
             composable(Screen.BottomBarCreateNewGoal.route) {
                 CreateNewGoalScreenNew(

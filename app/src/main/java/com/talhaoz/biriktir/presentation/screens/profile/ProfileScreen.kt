@@ -1,8 +1,16 @@
 package com.talhaoz.biriktir.presentation.screens.profile
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import android.provider.Settings
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -28,6 +36,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -42,14 +51,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -57,11 +69,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.google.accompanist.permissions.isGranted
 import com.talhaoz.biriktir.R
 import com.talhaoz.biriktir.notification.scheduleSalaryReminderWorker
 import com.talhaoz.biriktir.presentation.components.NotificationSettingsDialog
 import com.talhaoz.biriktir.ui.theme.AppTheme
+import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 
 
 @Composable
@@ -71,9 +89,14 @@ fun ProfileScreen(
     onThemeSelected: (AppTheme) -> Unit
 ) {
     val state by viewModel.userProfile.collectAsState()
+    val context = LocalContext.current
     val notificationSettingsState by viewModel.notificationSettingsState.collectAsState(initial = false)
     val themePreferenceState by viewModel.themePreferenceState.collectAsState(initial = AppTheme.GreenDark)
+
     var showNotificationSettingsDialog by remember { mutableStateOf(false) }
+    var showPhotoPicker by remember { mutableStateOf(false) }
+
+    var showSettingsDialog by remember { mutableStateOf(false) }
 
     val savedName = state?.fullName ?: ""
     val savedSalaryDay: Int? = state?.salaryDay
@@ -83,6 +106,19 @@ fun ProfileScreen(
         mutableStateOf(
             fullName != savedName || selectedDay != (savedSalaryDay ?: 0)
         )
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        bitmap?.let {
+            val file = File(context.cacheDir, "profile_${System.currentTimeMillis()}.jpg")
+            FileOutputStream(file).use { out -> it.compress(Bitmap.CompressFormat.JPEG, 90, out) }
+            val uri = FileProvider.getUriForFile(
+                context, "${context.packageName}.fileprovider", file
+            )
+            viewModel.updateProfilePhoto(uri)
+        }
     }
 
     LaunchedEffect(savedName, savedSalaryDay) {
@@ -96,7 +132,6 @@ fun ProfileScreen(
     val interactionSource = remember { MutableInteractionSource() }
     val scrollState = rememberScrollState()
 
-    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -112,15 +147,29 @@ fun ProfileScreen(
                 .size(120.dp)
                 .clip(CircleShape)
                 .background(Color(0xFFEDEDED))
-                .clickable(onClick = onAvatarClick),
+                .clickable(onClick = {
+                    showPhotoPicker = true
+                }),
             contentAlignment = Alignment.BottomEnd
         ) {
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                tint = MaterialTheme.colorScheme.primary
-            )
+            if(state?.photo != null){
+                AsyncImage(
+                    model = state?.photo?.let(Uri::parse),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
             Box(
                 modifier = Modifier
                     .size(32.dp)
@@ -284,7 +333,38 @@ fun ProfileScreen(
                 showNotificationSettingsDialog = false
             }
         )
+
+        /*if (showPhotoPicker) {
+            ProfilePhotoPicker {
+
+            }
+        }*/
     }
+
+    /*if (showSettingsDialog) {
+        AlertDialog(
+            onDismissRequest = { showSettingsDialog = false },
+            title = { Text("Kamera İzni Gerekli") },
+            text = { Text("Fotoğraf çekebilmek için kamera izni gerekli. Ayarlardan izni açmak ister misiniz?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(intent)
+                    showSettingsDialog = false
+                }) {
+                    Text("Ayarlar’a Git")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSettingsDialog = false }) {
+                    Text("İptal")
+                }
+            }
+        )
+    }*/
 }
 
 @Composable

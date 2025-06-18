@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,11 +33,11 @@ fun EmptyStatePlaceHolder(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            imageVector = Icons.Default.ReceiptLong,
+            imageVector = Icons.AutoMirrored.Filled.ReceiptLong,
             contentDescription = null,
             modifier = Modifier
                 .size(72.dp),
-            tint = Color(0xFFCCCCCC)
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(

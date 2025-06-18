@@ -15,5 +15,9 @@ class UserProfileRepositoryImpl @Inject constructor(
     override suspend fun updateProfile(name: String, salaryDay: Int?) {
         dao.insertOrUpdate(UserProfileStorageModel.fromDomain(UserProfile(fullName = name, salaryDay = salaryDay)))
     }
+
+    override suspend fun updatePhoto(uri: String?){
+        dao.updatePhoto(uri)
+    }
 }
 

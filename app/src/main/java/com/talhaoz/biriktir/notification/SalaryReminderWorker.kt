@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -14,42 +13,41 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.talhaoz.biriktir.MainActivity
 import com.talhaoz.biriktir.R
-import com.talhaoz.biriktir.data.local.datastore.NotificationSettingsDataStore
-import com.talhaoz.biriktir.domain.model.UserProfile
-import com.talhaoz.biriktir.domain.usecase.UserProfileUseCases
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.talhaoz.biriktir.data.local.datastore.SalaryDaySettingsDataStore.Companion.NOTIFICATION_SETTINGS_KEY
+import com.talhaoz.biriktir.data.local.datastore.SalaryDaySettingsDataStore.Companion.SALARY_DAY_KEY
+import com.talhaoz.biriktir.di.UserProfileModule.settingsDataStore
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
-@HiltWorker
-class SalaryReminderWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val userProfileUseCases: UserProfileUseCases,
-    private val notificationSettingsDataStore: NotificationSettingsDataStore
+class SalaryReminderWorker(
+    appContext: Context,
+    workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
-        val notificationsEnabled = notificationSettingsDataStore
-            .notificationSettingFlow
+        val context = applicationContext
+
+        val dataStore = context.settingsDataStore
+
+        val notificationEnabled = dataStore.data
+            .map { prefs -> prefs[NOTIFICATION_SETTINGS_KEY] ?: false }
             .first()
 
-        if (!notificationsEnabled) return Result.success()
+        val salaryDay = dataStore.data
+            .map { prefs -> prefs[SALARY_DAY_KEY] ?: 0 }
+            .first()
 
-        val profile: UserProfile? = userProfileUseCases.getProfile().firstOrNull()
-        val salaryDay = profile?.salaryDay ?: return Result.success()
+        if (!notificationEnabled) return Result.success()
+        if (salaryDay == 0) return Result.success()
 
         val today = LocalDate.now().dayOfMonth
         if (today == salaryDay) {
-
+            sendNotification()
         }
-
-        sendNotification()
 
         return Result.success()
     }
@@ -61,8 +59,8 @@ class SalaryReminderWorker @AssistedInject constructor(
 
         val channel = NotificationChannel(
             channelId,
-            "Maaş Günü Bildirimi",
-            NotificationManager.IMPORTANCE_DEFAULT
+            "Salary Reminder",
+            NotificationManager.IMPORTANCE_HIGH
         )
         notificationManager.createNotificationChannel(channel)
 
@@ -80,18 +78,18 @@ class SalaryReminderWorker @AssistedInject constructor(
         val notification = NotificationCompat.Builder(applicationContext, channelId)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Birikim Hatırlatması")
-            .setContentText("Bugün maaş gününüz! Birikim eklemeyi unutmayın 💸")
+            .setContentText("Bugün maaş gününüz! Birikim yapmayı unutmayın 💸")
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
         notificationManager.notify(1001, notification)
     }
 }
 
+
 fun scheduleSalaryReminderWorker(context: Context) {
-    val delayMinutes = calculateInitialDelayFor9AM()
+    val delayMinutes = calculateInitialDelayFor9PM()
 
     val request = PeriodicWorkRequestBuilder<SalaryReminderWorker>(
         1, TimeUnit.DAYS
@@ -107,11 +105,11 @@ fun scheduleSalaryReminderWorker(context: Context) {
     )
 }
 
-private fun calculateInitialDelayFor9AM(): Long {
+private fun calculateInitialDelayFor9PM(): Long {
     val now = LocalDateTime.now()
-    val today9AM = now.toLocalDate().atTime(11, 35)
+    val today9PM = now.toLocalDate().atTime(21, 0)
 
-    val nextRun = if (now.isBefore(today9AM)) today9AM else today9AM.plusDays(1)
+    val nextRun = if (now.isBefore(today9PM)) today9PM else today9PM.plusDays(1)
     val duration = Duration.between(now, nextRun)
 
     return duration.toMinutes()

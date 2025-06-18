@@ -8,13 +8,15 @@ import com.talhaoz.biriktir.domain.model.UserProfile
 data class UserProfileStorageModel(
     @PrimaryKey val id: Int = 0,
     val fullName: String,
-    val salaryDay: Int?
+    val salaryDay: Int?,
+    val photo: String? = null
 )  {
     internal fun toDomain() =
         UserProfile(
             id = id,
             fullName = fullName,
-            salaryDay = salaryDay
+            salaryDay = salaryDay,
+            photo = photo
         )
 
     companion object {
@@ -23,7 +25,8 @@ data class UserProfileStorageModel(
         ): UserProfileStorageModel =
             UserProfileStorageModel(
                 fullName = userProfile.fullName,
-                salaryDay = userProfile.salaryDay
+                salaryDay = userProfile.salaryDay,
+                photo = userProfile.photo
             )
     }
 }

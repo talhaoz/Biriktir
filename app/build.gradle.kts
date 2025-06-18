@@ -41,7 +41,6 @@ android {
     buildFeatures {
         compose = true
     }
-
     configurations.implementation{
         exclude(group = "com.intellij", module = "annotations")
     }
@@ -59,7 +58,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.work.runtime)
     implementation(libs.accompanist.permission)
-    implementation(libs.hilt.work)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -98,7 +96,6 @@ dependencies {
     // Hilt
     implementation(libs.dagger.hilt.lib)
     ksp(libs.dagger.hilt.compiler)
-    ksp(libs.hilt.hilt.compiler)
     implementation(libs.dagger.hilt.navigation)
 
     // Room
