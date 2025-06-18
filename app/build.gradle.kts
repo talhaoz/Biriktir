@@ -87,8 +87,11 @@ dependencies {
     // Kotlin
     implementation(libs.kotlin.stdlib)
 
-    // Optional: Coil for image loading
+    // Coil for image loading
     implementation(libs.coil.compose)
+
+    // Splash Screen
+    implementation(libs.splash.screen)
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)

@@ -32,7 +32,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:windowSoftInputMode="stateVisible"
-            android:theme="@style/Theme.Biriktir">
+            android:theme="@style/Theme.Biriktir.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

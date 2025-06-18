@@ -29,6 +29,7 @@ room_version = "2.6.1"
 google-ksp = "2.0.0-1.0.21"
 work-runtime = "2.9.0"
 accompanist-permission = "0.36.0"
+splash-version= "1.0.1"
 
 [libraries]
 androidx-activity-compose-v190 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
@@ -69,6 +70,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room_ve
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room_version" }
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work-runtime" }
 accompanist-permission = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permission" }
+splash-screen = { module = "androidx.core:core-splashscreen", version.ref = "splash-version" }
 
 
 [plugins]

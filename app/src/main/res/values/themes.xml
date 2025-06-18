@@ -18,4 +18,10 @@
         <item name="android:colorPrimary">#F57C00</item>
     </style>
 
+    <style name="Theme.Biriktir.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.Biriktir</item>
+    </style>
+
 </resources>
